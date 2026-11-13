@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Faso DARK</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#071026;--card:#0D1B3E;--line:#1E3470;--txt:#EAF1FF;--mut:#9FB3D9;--blue:#2F7BFF;--cy:#4FC3F7;--ok:#5FE0A8;--okbg:#123B2E;--bad:#FF8A80;--band:#4FC3F7;--badbg:#3A1A1A;--red:#B3261E;--focus:#E53946;--up:#8DB4FF;--sel:#3B3F63;--hd:#3B5190;--ov:rgba(3,8,20,.75);--glo:.55;--t1:#0B1A40;--t2:#0F2252;--t3:#132B66;--t4:#18357D;--t5:#1D4296;color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-mode="light"]{--bg:#F3F6FD;--card:#FFFFFF;--line:#C5D2EC;--txt:#0B1A40;--mut:#4D5E86;--blue:#1F66E6;--cy:#0B78B8;--ok:#0B7A4F;--okbg:#D9F3E6;--bad:#B3261E;--band:#0B78B8;--badbg:#FBE3E0;--red:#B3261E;--focus:#D32F3F;--up:#3A5FC4;--sel:#DCE7FB;--hd:#B8C6E6;--ov:rgba(11,26,64,.5);--glo:.3;--t1:#DCE7FB;--t2:#CFDEF8;--t3:#C0D4F5;--t4:#B0C8F2;--t5:#A0BCEE;color-scheme:light}
+[hidden]{display:none!important}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+#app{max-width:430px;margin:0 auto;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;flex:none}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:1px}
+.ib{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;padding:0;color:var(--txt);cursor:pointer;flex:none}
+.ib.sm{width:38px;height:38px;border-radius:12px}
+main{flex:1;overflow-y:auto;padding:0 20px 16px}
+.screen[hidden],.modal[hidden],#dw[hidden],#toast[hidden]{display:none}
+h2{font-size:22px;margin:4px 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-bottom:12px}
+.card h3{font-size:15px;margin:0 0 8px}
+small,.mut{color:var(--mut);font-size:12px}
+.note{font-size:12px;color:var(--mut);margin:0 0 10px;text-align:center}
+.btn{height:46px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--txt);font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;width:100%;margin-top:8px}
+.btn.p{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.o{border-color:var(--blue)}
+.btn.r{background:var(--red);border-color:var(--red);color:#fff}
+.btn.s{height:38px;width:auto;padding:0 14px;margin:0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.chip{font-size:12px;font-weight:600;padding:5px 10px;border-radius:10px;background:var(--line);color:var(--mut);white-space:nowrap}
+.ok{background:var(--okbg);color:var(--ok)}.bad{background:var(--badbg);color:var(--bad)}
+.item{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:8px;font-size:14px;font-weight:600}
+.item.sel{border-color:var(--band)}
+.item .inf{min-width:0;flex:1;overflow-wrap:anywhere;cursor:pointer}
+.item .act{display:flex;align-items:center;gap:6px;flex:none;margin-left:8px}
+.bl{color:var(--up)}
+.tun{position:relative;margin:0 0 12px}
+.tun svg{display:block;width:100%;height:auto}
+.cbtn{position:absolute;left:50%;top:44%;width:116px;height:116px;margin:-58px 0 0 -58px;border-radius:50%;border:4px solid var(--cy);background:linear-gradient(160deg,#2F7BFF,#1747B8);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.cbtn.on{border-color:var(--ok)}
+@media (prefers-reduced-motion:no-preference){.cbtn.on{animation:pl 2s infinite}@keyframes pl{50%{box-shadow:0 0 0 14px rgba(95,224,168,.15)}}}
+.stat{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.grid div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 14px}
+.grid b{font-size:17px;display:block}
+.handle{width:44px;height:5px;border-radius:3px;background:var(--hd);margin:0 auto 12px}
+nav{display:flex;justify-content:space-around;flex:none;height:68px;background:var(--card);border-top:1px solid var(--line)}
+nav button{width:96px;border:0;background:none;color:var(--mut);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+nav button.on{color:var(--cy)}
+nav svg{stroke:currentColor}
+.scrim{position:absolute;inset:0;background:var(--ov);z-index:5}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:min(340px,90%);background:var(--card);border-left:1px solid var(--line);border-radius:24px 0 0 24px;padding:18px 16px;overflow-y:auto;z-index:6}
+.drawer .card{background:var(--bg)}
+.modal{position:absolute;inset:0;z-index:10;display:flex;align-items:flex-end;justify-content:center;background:var(--ov)}
+.sheet{width:100%;background:var(--card);border:1px solid var(--line);border-radius:24px 24px 0 0;padding:18px;max-height:90%;overflow-y:auto}
+.modal.c{align-items:center;padding:20px}.modal.c .sheet{border-radius:20px}
+textarea,input[type=text],input[type=number],input[type=datetime-local]{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--txt);font-family:inherit;font-size:14px}
+textarea{height:130px;resize:none;line-height:1.6}
+.chk{display:flex;align-items:center;gap:12px;min-height:44px;font-size:14px}
+.chk input{width:20px;height:20px;accent-color:#E53946;flex:none}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px}
+.tabs button{flex:none;height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:none;color:var(--txt);font-family:inherit;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--sel);border-color:var(--sel)}
+.code{word-break:break-all;font-size:13px;line-height:1.5;background:var(--bg);border-radius:12px;padding:12px;margin-bottom:8px}
+details{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin-bottom:8px}
+summary{font-weight:600;cursor:pointer;min-height:24px}
+details p{color:var(--mut);font-size:14px;line-height:1.5;margin:8px 0 0}
+#toast{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);background:var(--txt);color:var(--bg);font-size:13px;font-weight:600;padding:10px 16px;border-radius:12px;z-index:20;max-width:90%;text-align:center}
+select{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--txt);font-family:inherit;font-size:14px}
+.seg{display:flex;gap:6px}.seg button{flex:1;height:44px;border-radius:12px;border:1px solid var(--line);background:none;color:var(--txt);font-family:inherit;font-weight:600;font-size:14px;cursor:pointer}.seg button[aria-checked=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+#pu{stroke:var(--up)}.t1{fill:var(--t1)}.t2{fill:var(--t2)}.t3{fill:var(--t3)}.t4{fill:var(--t4)}.t5{fill:var(--t5)}
+.wel{font-size:14px;font-weight:600;text-align:center;margin:0 0 10px;color:var(--band)}.wel[hidden]{display:none}
+#pd{stroke:var(--band)}.card.band{border-top:3px solid var(--band)}.cy{color:var(--band)}
+.fld{position:relative;margin:20px 0 0}
+.fld>label{position:absolute;top:-9px;left:12px;background:var(--bg);padding:0 6px;font-size:12px;color:var(--mut);z-index:1}
+.fld input,.fld select,.fld textarea{width:100%;background:transparent;font-size:16px;padding:14px}
+.fld select{appearance:none;-webkit-appearance:none;padding-right:38px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%239FB3D9' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 16px center}
+.fld select option{background:var(--card);color:var(--txt)}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--focus)}
+.fld textarea.mono{height:170px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5}
+.seg button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+.seg.home{margin:0 0 10px}
+.pager{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;scrollbar-width:none;align-items:flex-start}.pager::-webkit-scrollbar{display:none}
+.pane{flex:0 0 100%;scroll-snap-align:start;padding:0 20px;min-width:0}
+.fab{position:absolute;right:20px;bottom:88px;width:56px;height:56px;border-radius:28px;border:0;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:4;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.lg{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.4}.lg time{color:var(--mut);flex:none;font-variant-numeric:tabular-nums}.lg span{min-width:0;overflow-wrap:anywhere}.lg.g span{color:var(--ok)}.lg.x span{color:var(--bad)}
+#splash{position:absolute;inset:0;z-index:50;background:radial-gradient(circle at 50% 38%,rgba(47,123,255,var(--glo)) 0,rgba(47,123,255,0) 58%),var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;cursor:pointer;transition:opacity .45s ease}
+#splash.out{opacity:0;pointer-events:none}
+#splash img{width:96px;height:96px;border-radius:26px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+#splash h1{margin:6px 0 0;font-size:30px;letter-spacing:2px;display:flex;align-items:center;gap:10px}
+#splash p{margin:0;color:var(--mut);font-size:14px}
+#splash .bar{width:160px;height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:18px}
+#splash .bar i{display:block;height:100%;width:100%;background:var(--cy);border-radius:2px;transform-origin:left;transform:scaleX(1)}
+@media (prefers-reduced-motion:no-preference){#splash img{animation:sp 1.1s ease-out both}#splash .bar i{animation:ld 1.7s ease-in-out both}@keyframes sp{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}@keyframes ld{from{transform:scaleX(0)}to{transform:scaleX(1)}}}
+.lock{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:13px;line-height:1.5;color:var(--mut)}
+</style></head><body>
+<div id="app">
+<div id="splash" role="status" aria-label="Chargement de Faso DARK"><img src="data:image/png;base64,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" alt=""><h1>Faso DARK<svg width="34" height="22" viewBox="0 0 24 16" role="img" aria-label="Drapeau du Burkina Faso"><rect width="24" height="8" fill="#EF2B2D"/><rect y="8" width="24" height="8" fill="#009E49"/><polygon points="12,4.2 13.2,6.9 16,7.2 13.9,9.1 14.5,12 12,10.5 9.5,12 10.1,9.1 8,7.2 10.8,6.9" fill="#FCD116"/></svg></h1><p>Connexion privée du groupe</p><div class="bar"><i></i></div></div>
+<header><div class="brand"><img src="data:image/png;base64,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" width="34" height="34" alt="" style="border-radius:9px">Faso DARK<svg width="30" height="20" viewBox="0 0 24 16" role="img" aria-label="Drapeau du Burkina Faso"><rect width="24" height="8" fill="#EF2B2D"/><rect y="8" width="24" height="8" fill="#009E49"/><polygon points="12,4.2 13.2,6.9 16,7.2 13.9,9.1 14.5,12 12,10.5 9.5,12 10.1,9.1 8,7.2 10.8,6.9" fill="#FCD116"/></svg></div>
+<button class="ib" id="menuBtn" aria-label="Menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg></button></header>
+<main id="main">
+<section class="screen" id="s-home">
+<div class="seg home"><button type="button" id="tC" aria-pressed="true">Connexion</button><button type="button" id="tL" aria-pressed="false">Logs</button></div>
+<div class="pager" id="pager"><div class="pane">
+<p class="wel" id="wel" hidden></p>
+<div class="card band"><div class="row" style="font-size:13px;font-weight:600"><span class="cy">↓ <span id="dl">0,0</span> Mo/s</span><span class="bl">↑ <span id="ul">0,0</span> Mo/s</span></div>
+<svg viewBox="0 0 316 70" width="100%" height="70" role="img" aria-label="Graphique de débit"><path id="pd" fill="none" stroke="#4FC3F7" stroke-width="2.5" stroke-linejoin="round"/><path id="pu" fill="none" stroke="#8DB4FF" stroke-width="2" stroke-dasharray="4 3" stroke-linejoin="round"/></svg></div>
+<div class="tun"><svg viewBox="0 0 350 290" aria-hidden="true"><defs><radialGradient id="g"><stop offset="0" style="stop-color:var(--blue);stop-opacity:var(--glo)"/><stop offset="1" style="stop-color:var(--blue);stop-opacity:0"/></radialGradient></defs><rect x="5" y="5" width="340" height="280" rx="60" class="t1"/><rect x="35" y="30" width="280" height="230" rx="52" class="t2"/><rect x="65" y="55" width="220" height="180" rx="44" class="t3"/><rect x="95" y="80" width="160" height="130" rx="36" class="t4"/><rect x="120" y="100" width="110" height="90" rx="28" class="t5"/><circle cx="175" cy="145" r="120" fill="url(#g)"/></svg>
+<button class="cbtn" id="cbtn" aria-label="Connecter" aria-pressed="false"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.3 7.2a8 8 0 1 0 11.4 0"/></svg></button><div class="stat" id="stat">Déconnecté</div></div>
+<div class="grid"><div><small>Aujourd’hui</small><b id="u1"></b></div><div><small>Cette semaine</small><b id="u2"></b></div><div><small>Ce mois-ci</small><b id="u3"></b></div><div><small>Total</small><b id="u4"></b></div></div>
+<div class="card"><div class="handle"></div><div class="row"><div><b id="hf"></b><br><small id="hn"></small></div><span class="chip" id="fstat">Déconnecté</span></div></div>
+</div>
+<div class="pane" id="logp"><div class="row" style="margin-bottom:8px"><b style="font-size:18px">Logs</b><span style="display:flex;gap:8px"><button class="btn s" id="lcp">Copier</button><button class="btn s" id="lcl">Effacer</button></span></div><div id="loglist" aria-live="polite"></div><p class="note" style="margin-top:12px">Glisse vers la droite ou touche « Connexion » pour revenir.</p></div>
+</div>
+</section>
+<section class="screen" id="s-profil" hidden style="padding-bottom:80px"><h2>Profil</h2><div id="files"></div>
+<div class="row" style="gap:8px"><button class="btn o" id="impF" style="flex:1">Importer un fichier</button><button class="btn o" id="impL" style="flex:1">Importer un lien</button></div><input type="file" id="ffi" hidden>
+<button class="btn p" id="expGo">Exporter la configuration</button></section>
+<section class="screen" id="s-edit" hidden><div class="row" style="justify-content:flex-start;gap:4px"><button class="ib" data-go="profil" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><b id="edt" style="font-size:20px;margin-left:8px">Modifier le profil</b></div>
+<div id="edf"></div><button class="btn r" id="edok" style="margin-top:24px">Mettre à jour</button></section>
+<section class="screen" id="s-guide" hidden><h2>Guide</h2>
+<details open><summary>Se connecter</summary><p>Appuie sur le gros bouton de l’accueil. La première fois, Android demande l’autorisation VPN : accepte-la.</p></details>
+<details><summary>Ajouter une configuration</summary><p>Dans Profil, appuie sur le bouton + et remplis le formulaire, ou importe un fichier ou un lien. Touche un profil pour l’activer : il apparaît en bas de l’accueil.</p></details>
+<details><summary>Modifier une configuration</summary><p>Le crayon à côté d’un profil ouvre le formulaire de modification. Un profil verrouillé n’a pas de crayon : ses coordonnées restent cachées et on ne peut pas le modifier.</p></details>
+<details><summary>Tester les hôtes</summary><p>Menu à trois points, puis « Tester les hôtes » : écris tes hôtes, un par ligne, puis appuie sur « Tester les hôtes ». Chaque hôte indique s’il fonctionne ou non. Le bouton Arrêter coupe le test.</p></details>
+<details><summary>Voir les logs</summary><p>Sur l’accueil, touche « Logs » ou glisse vers la droite. Tu y vois les connexions, les recherches et les imports. « Copier » envoie le texte, « Effacer » vide la liste.</p></details>
+<details><summary>Rechercher l’IP du téléphone</summary><p>Menu à trois points : colle tes bons IP dans « Liste des IP », puis lance « Chercher l’IP du téléphone ». Quand l’IP du téléphone est dans ta liste, la recherche s’arrête et tu peux te connecter.</p></details>
+<details><summary>Exporter une configuration</summary><p>Dans Profil, appuie sur Exporter à côté du profil, coche les verrouillages voulus, puis partage en fichier, QR, lien ou cloud. Un fichier verrouillé est chiffré : personne ne voit l’adresse, l’UUID, l’hôte ni le chemin. La personne ouvre le fichier, choisit l’application et se connecte.</p></details>
+<details><summary>Verrous et limites</summary><p>Tu peux lier la config à un appareil, bloquer le WiFi ou les appareils rootés, fixer une expiration et limiter les données.</p></details>
+<details><summary>Sécurité</summary><p>Les serveurs gratuits sont partagés. Évite d’y passer la banque ou des mots de passe importants.</p></details></section>
+<section class="screen" id="s-export" hidden><div class="row" style="margin-bottom:12px"><button class="ib" data-go="profil" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><b style="font-size:20px;flex:1;margin-left:4px">Exporteur de configuration</b></div>
+<small>Profil : <b id="epn" style="color:var(--txt)"></b></small><input type="text" id="nm" placeholder="Nom du fichier de configuration" aria-label="Nom du fichier de configuration" style="margin:8px 0 12px">
+<div class="card"><h3>Sécurité / Verrouillage</h3><div class="lock">Verrouillé : le fichier est chiffré. La personne ne voit ni l’adresse, ni l’UUID, ni l’hôte, ni le chemin, et ne peut pas modifier le profil.</div><div id="opts"></div></div>
+<div class="card"><h3>Messages</h3><div id="msgs"></div></div>
+<button class="btn r" id="exp">Exporter la configuration</button></section>
+<section class="screen" id="s-hotes" hidden><div class="row" style="margin-bottom:12px"><button class="ib" data-go="home" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><b style="font-size:22px;flex:1;margin-left:4px">Tester les hôtes</b></div>
+<small>Écris les hôtes à tester, un par ligne. L’appli dit si chaque hôte fonctionne ou non.</small><label for="hl" style="display:block;font-weight:600;font-size:13px;margin:10px 0 6px">Hôtes à tester</label>
+<textarea id="hl" spellcheck="false">exemple-hote.com
+cdn.exemple.net
+api.exemple.org</textarea>
+<button class="btn p" id="hBtn" style="margin-top:12px">Tester les hôtes</button><small id="hprog" style="display:block;margin-top:10px"></small><div id="found"></div></section>
+<section class="screen" id="s-liste" hidden><div class="row" style="margin-bottom:12px"><button class="ib" data-go="home" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><b style="font-size:22px;flex:1;margin-left:4px">Liste des IP</b></div>
+<small>Colle tes bons IP, un par ligne. Un IP qui finit par un point, comme 41.207., couvre toute la plage. Les hôtes se testent depuis le menu, avec « Tester les hôtes ».</small><label for="lst" style="display:block;font-weight:600;font-size:13px;margin:10px 0 6px">IP</label>
+<textarea id="lst" spellcheck="false">41.207.10.1
+196.28.5.9
+102.220.3.4
+41.207.</textarea>
+<div class="row" style="margin-top:8px"><button class="btn o" id="imp" style="margin:0">Importer un fichier</button><button class="btn" id="clr" style="margin:0;width:96px">Vider</button></div><input type="file" id="fi" accept=".txt,text/plain" hidden>
+<div class="row mut" style="margin:12px 0 0;font-size:13px"><span id="cnt"></span></div><div id="lres"></div>
+<button class="btn p" id="lt" style="margin-top:16px">Chercher l’IP du téléphone</button><button class="btn" id="lsave">Enregistrer la liste</button></section>
+</main>
+<nav><button data-t="home" class="on"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10h-6v-6H9v6H3z"/></svg>Accueil</button><button data-t="profil"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profil</button><button data-t="guide"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 6c-1.5-1.5-4-2-8-2v14c4 0 6.5.5 8 2 1.5-1.5 4-2 8-2V4c-4 0-6.5.5-8 2zM12 6v14"/></svg>Guide</button></nav>
+<button class="fab" id="fab" aria-label="Ajouter une configuration" hidden><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+<div id="dw" hidden><div class="scrim" id="scr"></div><aside class="drawer" aria-label="Outils"><div class="row" style="margin-bottom:12px"><b style="font-size:20px">Outils</b><button class="ib" id="dx" aria-label="Fermer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+<div class="card"><h3>Connexion VPN</h3><small>Autorisation demandée par Android pour ouvrir un VPN.</small><button class="btn p" id="perm">Autoriser la connexion VPN</button></div>
+<div class="card"><h3>Apparence</h3><div class="seg" id="modeSeg" role="radiogroup" aria-label="Apparence"><button type="button" role="radio" data-m="dark" aria-checked="true">Sombre</button><button type="button" role="radio" data-m="light" aria-checked="false">Clair</button></div></div>
+<div class="card"><h3>IP du téléphone</h3><small id="sst">Compare l’IP du téléphone à ta liste de bons IP.</small><div class="item" id="pip" hidden></div><button class="btn p" id="sBtn">Chercher l’IP du téléphone</button><label class="chk" style="margin-top:6px"><input type="checkbox" id="needIp">Vérifier l’IP avant de se connecter</label><button class="btn" data-go="liste" style="margin-top:0">Liste des IP</button></div>
+<div class="card"><h3>Hôtes</h3><small>Vérifie quels hôtes fonctionnent.</small><button class="btn o" data-go="hotes">Tester les hôtes</button></div>
+<div class="card"><h3>Aide</h3><button class="btn" data-go="guide" style="margin-top:0">Comment utiliser l’application</button><button class="btn" id="abt">À propos</button></div></aside></div>
+<div class="modal c" id="dm" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dt"><b id="dt" style="font-size:18px"></b><p id="dtx" class="mut" style="font-size:14px;line-height:1.5"></p><div class="row" style="justify-content:flex-end"><button class="btn s" id="dno">Annuler</button><button class="btn s p" id="dok">OK</button></div></div></div>
+<div class="modal" id="pm" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pt"><div class="row" style="margin-bottom:12px"><b id="pt" style="font-size:22px">Exporter</b><button class="ib" id="px" aria-label="Fermer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+<div class="tabs" id="tabs"></div><div id="pbody"></div><div class="row"><button class="btn p" id="cp" style="flex:1">Copier</button><button class="btn" id="sh" style="flex:1">Partager</button></div></div></div>
+<div class="modal c" id="em" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="et"><b id="et" style="font-size:18px"></b><div id="ef" style="margin:12px 0"></div><div class="row" style="justify-content:flex-end"><button class="btn s" id="eno">Annuler</button><button class="btn s p" id="eok">OK</button></div></div></div><div id="toast" role="status" hidden></div>
+</div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const toast=m=>{const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast.i);toast.i=setTimeout(()=>t.hidden=true,2600)};
+const LOGS=[];
+function renderLogs(){$('#loglist').innerHTML=LOGS.length?LOGS.map(l=>`<div class="lg ${l.k==='ok'?'g':l.k==='bad'?'x':''}"><time>${l.t}</time><span>${esc(l.m)}</span></div>`).join(''):'<p class="mut" style="text-align:center;margin-top:16px">Aucun événement pour l’instant.</p>'}
+function log(m,k){const d=new Date(),q=n=>String(n).padStart(2,'0');LOGS.unshift({t:q(d.getHours())+':'+q(d.getMinutes())+':'+q(d.getSeconds()),m,k:k||'info'});if(LOGS.length>80)LOGS.pop();renderLogs()}
+const pgr=$('#pager');
+function tabSync(){const i=pgr.scrollLeft>pgr.clientWidth/2?1:0;$('#tC').setAttribute('aria-pressed',String(i===0));$('#tL').setAttribute('aria-pressed',String(i===1))}
+pgr.addEventListener('scroll',tabSync);
+function goPane(i){const x=i*pgr.clientWidth;pgr.scrollTo({left:x,behavior:'smooth'});setTimeout(()=>{if(Math.abs(pgr.scrollLeft-x)>2){pgr.scrollTo({left:x,behavior:'auto'});tabSync()}},500)}
+$('#tC').onclick=()=>goPane(0);$('#tL').onclick=()=>goPane(1);
+$('#lcl').onclick=()=>{LOGS.length=0;renderLogs()};
+$('#lcp').onclick=async()=>{if(!LOGS.length){toast('Rien à copier');return}try{await navigator.clipboard.writeText(LOGS.slice().reverse().map(l=>l.t+'  '+l.m).join('\n'));toast('Logs copiés')}catch(e){toast('Copie impossible ici')}};
+renderLogs();
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function show(id){$$('.screen').forEach(e=>e.hidden=e.id!=='s-'+id);const m={home:'home',profil:'profil',guide:'guide',export:'profil',edit:'profil',liste:'home',hotes:'home'}[id];$('#fab').hidden=id!=='profil';$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===m));$('#main').scrollTop=0;if(id==='home')tabSync()}
+$$('nav button').forEach(b=>b.onclick=()=>show(b.dataset.t));
+$$('[data-go]').forEach(b=>b.onclick=()=>{$('#dw').hidden=true;show(b.dataset.go)});
+$('#menuBtn').onclick=()=>$('#dw').hidden=false;$('#scr').onclick=$('#dx').onclick=()=>$('#dw').hidden=true;
+function dlg(t,x,ok,cb,single){$('#dt').textContent=t;$('#dtx').textContent=x;$('#dno').hidden=!!single;$('#dok').textContent=ok;$('#dm').hidden=false;$('#dok').onclick=()=>{$('#dm').hidden=true;cb&&cb()};$('#dno').onclick=()=>$('#dm').hidden=true}
+$('#abt').onclick=()=>dlg('Faso DARK','Application VPN pour le groupe.','Fermer',null,true);
+let perm=false;
+function setPerm(){perm=true;log('Autorisation VPN accordée','ok');const b=$('#perm');b.textContent='Connexion VPN autorisée';b.className='btn ok'}
+$('#perm').onclick=()=>perm?toast('Déjà autorisée'):dlg('Demande de connexion','Faso DARK veut configurer une connexion VPN. Autoriser ?','OK',setPerm);
+const fmt=v=>v>=1024?(v/1024).toFixed(1).replace('.',',')+' Go':Math.round(v)+' Mo';
+const U=[312,1843,6554,50074];const renderU=()=>U.forEach((v,i)=>$('#u'+(i+1)).textContent=fmt(v));renderU();
+const D=Array(30).fill(0),Up=Array(30).fill(0);
+const path=a=>'M'+a.map((v,i)=>(i*316/29).toFixed(1)+' '+(64-v*11).toFixed(1)).join(' L');
+function chart(){$('#pd').setAttribute('d',path(D));$('#pu').setAttribute('d',path(Up))}chart();
+let st='off',iv,gt=null;
+function setSt(s){st=s;const b=$('#cbtn');b.classList.toggle('on',s==='on');b.setAttribute('aria-pressed',s==='on');$('#stat').textContent={off:'Déconnecté',mid:'Connexion…',on:'Connecté · 42 ms'}[s];const f=$('#fstat');f.textContent=s==='on'?'Connecté':s==='mid'?'Connexion…':'Déconnecté';f.className='chip'+(s==='on'?' ok':'')}
+function push(d,u){D.push(d);D.shift();Up.push(u);Up.shift();$('#dl').textContent=d.toFixed(1).replace('.',',');$('#ul').textContent=u.toFixed(1).replace('.',',');chart()}
+function go(){const a=files[act];log('Connexion au profil « '+(a?a.n:'')+' »…');setSt('mid');gt=setTimeout(()=>{gt=null;setSt('on');log('Connecté · 42 ms','ok');if(cur&&cur.m)dlg('Message de connexion',cur.m,'OK',null,true);iv=setInterval(()=>{const d=1.2+Math.random()*2.6,u=.3+Math.random()*.8;push(d,u);for(let i=0;i<4;i++)U[i]+=d+u;renderU()},1000)},1300)}
+$('#cbtn').onclick=()=>{
+if(st==='mid'){if(ipStop){ipStop();ipStop=null;ipBtns(false)}if(gt){clearTimeout(gt);gt=null}log('Connexion annulée');setSt('off');return}
+if(st==='on'){clearInterval(iv);log('Déconnecté');setSt('off');ipOk=false;for(let i=0;i<30;i++)push(0,0);return}
+const a=files[act];if(!a){toast('Ajoute d’abord une configuration');return}
+if(a.exp&&new Date(a.exp)<Date.now()){log('Échec : profil expiré','bad');toast('Profil expiré');return}
+if(!perm){dlg('Demande de connexion','Faso DARK veut configurer une connexion VPN. Autoriser ?','OK',()=>{setPerm();$('#cbtn').click()});return}
+if($('#needIp').checked&&!ipOk){setSt('mid');$('#stat').textContent='Recherche de l’IP du téléphone…';ipRun(go);return}
+go()};
+setSt('off');
+
+/* ===== Profils ===== */
+const DEF={protocol:'VMess',name:'',address:'',port:'443',uuid:'',alterId:'0',transport:'ws',host:'',path:'/',security:'tls',sni:'',alpn:'Aucun',json:''};
+const files=[{n:'faso-dark-sub',cfg:{...DEF,name:'faso-dark-sub',address:'exemple.com',uuid:'00000000-0000-4000-8000-000000000000',host:'exemple.com',path:'/vmess'}}];
+let act=0,cur=null;
+function applyCfg(f){if(!f){cur=null;$('#wel').hidden=true;return}cur=f;const w=$('#wel');w.hidden=!f.w;w.textContent=f.w||''}
+const sub=f=>{if(f.locked)return'Configuration protégée';const c=f.cfg||{};return c.protocol&&c.protocol.startsWith('Perso')?'JSON personnalisé':(c.protocol||'')+' · '+(c.address||'')+':'+(c.port||'')};
+const ICON={pen:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>',trash:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>'};
+function renderF(){
+$('#files').innerHTML=files.map((f,i)=>`<div class="item${i===act?' sel':''}"><span class="inf" data-a="${i}">${esc(f.n)}<br><small>${esc(sub(f))}${f.creator?' · par '+esc(f.creator):''}${f.lim?' · '+esc(f.lim):''}${f.exp?' · expire '+esc(String(f.exp).replace('T',' à ')):''}</small></span><span class="act">${f.locked?'<span class="chip">Verrouillé</span>':`<button class="ib sm" data-p="${i}" aria-label="Modifier ${esc(f.n)}">${ICON.pen}</button><button class="btn s o" data-e="${i}">Exporter</button>`}<button class="ib sm" data-d="${i}" aria-label="Supprimer ${esc(f.n)}">${ICON.trash}</button></span></div>`).join('')||'<p class="mut">Aucun fichier. Ajoute une configuration.</p>';
+const a=files[act];$('#hf').textContent=a?a.n:'Aucun fichier';$('#hn').textContent=a?sub(a):'Ajoute-en un dans Profil';
+$$('[data-a]').forEach(b=>b.onclick=()=>{act=+b.dataset.a;applyCfg(files[act]);renderF()});
+$$('[data-p]').forEach(b=>b.onclick=()=>openEdit(+b.dataset.p));
+$$('[data-e]').forEach(b=>b.onclick=()=>openExport(+b.dataset.e));
+$$('[data-d]').forEach(b=>b.onclick=()=>askDel(+b.dataset.d))}
+function askDel(i){const f=files[i];dlg('Supprimer ce profil ?','« '+f.n+' » sera supprimé de ce téléphone.','Supprimer',()=>{const was=i===act;log('Profil supprimé : '+f.n);files.splice(i,1);if(i<act)act--;else if(act>=files.length)act=Math.max(0,files.length-1);if(was)applyCfg(files[act]);renderF()})}
+
+/* ===== Formulaire : ajouter / modifier ===== */
+const T1=['address','port','uuid','transport','host','path','security','sni','alpn'];
+const SHOW={VLESS:T1,VMess:['address','port','uuid','alterId','transport','host','path','security','sni','alpn'],Trojan:T1,Shadowsocks:['address','port','uuid'],SOCKS:['address','port'],HTTP:['address','port'],WireGuard:['address','port','uuid'],'Personnalisé (JSON)':['json']};
+const PROTOS=Object.keys(SHOW);
+const LAB={address:'Adresse',port:'Port',uuid:'UUID',alterId:'Alter ID',transport:'Transport',host:'Hôte',path:'Chemin',security:'Sécurité',sni:'SNI',alpn:'ALPN',json:'Configuration JSON'};
+const ULAB={Trojan:'Mot de passe',Shadowsocks:'Mot de passe',WireGuard:'Clé privée'};
+const OPT={transport:['tcp','ws','grpc','h2','httpupgrade'],security:['none','tls','reality'],alpn:['Aucun','h2','http/1.1','h2,http/1.1']};
+const NUM=['port','alterId'];
+let edIdx=-1,edCfg={...DEF};
+function fld(k,label,c){const v=c[k]==null?'':String(c[k]);
+if(OPT[k]){const o=(!v||OPT[k].includes(v))?OPT[k]:[...OPT[k],v];return`<div class="fld"><label for="f-${k}">${label}</label><select id="f-${k}" data-f="${k}">${o.map(x=>`<option${x===v?' selected':''}>${esc(x)}</option>`).join('')}</select></div>`}
+if(k==='json')return`<div class="fld"><label for="f-json">${label}</label><textarea id="f-json" data-f="json" class="mono" spellcheck="false">${esc(v)}</textarea></div>`;
+return`<div class="fld"><label for="f-${k}">${label}</label><input type="text" id="f-${k}" data-f="${k}" value="${esc(v)}"${NUM.includes(k)?' inputmode="numeric"':''} autocomplete="off" autocapitalize="off" spellcheck="false"></div>`}
+function collect(){$$('#edf [data-f]').forEach(e=>edCfg[e.dataset.f]=e.value)}
+function renderEd(){const c=edCfg,vis=SHOW[c.protocol]||[];
+$('#edf').innerHTML=`<div class="fld"><label for="f-protocol">Protocole</label><select id="f-protocol">${PROTOS.map(p=>`<option${p===c.protocol?' selected':''}>${esc(p)}</option>`).join('')}</select></div>`+fld('name','Nom du profil',c)+vis.map(k=>fld(k,k==='uuid'?(ULAB[c.protocol]||'UUID'):LAB[k],c)).join('');
+$('#f-protocol').onchange=e=>{collect();edCfg.protocol=e.target.value;renderEd()}}
+function openEdit(i){const f=i>=0?files[i]:null;if(f&&f.locked){toast('Configuration verrouillée : modification impossible');return}
+edIdx=i;edCfg=f?{...DEF,...f.cfg}:{...DEF};$('#edt').textContent=f?'Modifier le profil':'Nouveau profil';$('#edok').textContent=f?'Mettre à jour':'Ajouter';renderEd();show('edit')}
+function saveEd(){collect();const c=edCfg,vis=SHOW[c.protocol]||[];
+if(!c.name.trim()){toast('Écris le nom du profil');return}
+if(vis.includes('json')){try{JSON.parse(c.json)}catch(e){toast('JSON non valide');return}}
+else{if(!c.address.trim()){toast('Écris l’adresse');return}
+const p=Number(c.port.trim());if(!(Number.isInteger(p)&&p>=1&&p<=65535)){toast('Port non valide (1 à 65535)');return}
+if(vis.includes('alterId')&&c.alterId.trim()&&!/^\d+$/.test(c.alterId.trim())){toast('Alter ID non valide');return}
+if(vis.includes('uuid')&&!c.uuid.trim()){toast('Remplis le champ '+(ULAB[c.protocol]||'UUID'));return}}
+const cfg={protocol:c.protocol,name:c.name.trim()};vis.forEach(k=>cfg[k]=k==='json'?c[k]:String(c[k]).trim());
+if(edIdx<0){files.push({n:cfg.name,cfg});if(files.length===1){act=0;applyCfg(files[0])}log('Configuration ajoutée : '+cfg.name,'ok');toast('Configuration ajoutée')}
+else{files[edIdx].cfg=cfg;files[edIdx].n=cfg.name;log('Profil mis à jour : '+cfg.name,'ok');toast('Profil mis à jour')}
+renderF();show('profil')}
+$('#edok').onclick=saveEd;$('#fab').onclick=()=>openEdit(-1);
+
+/* ===== Listes, IP, hôtes ===== */
+const lst=()=>$('#lst').value.split('\n').map(s=>s.trim()).filter(Boolean);
+const isIp=s=>/^\d{1,3}(\.|$)/.test(s);
+function run(arr,row,prog,done){let i=0,f=0;const h=setInterval(()=>{const e=arr[i++],ok=Math.random()<.55;if(ok)f++;row(e,ok,25+Math.floor(Math.random()*120));prog(i,arr.length);if(i>=arr.length){clearInterval(h);done(f)}},450);return()=>clearInterval(h)}
+const phoneIp=l=>{if(Math.random()<.3){const e=l[Math.floor(Math.random()*l.length)];return e.endsWith('.')?e+(1+Math.floor(Math.random()*250)):e}return[10+Math.floor(Math.random()*200),Math.floor(Math.random()*255),Math.floor(Math.random()*255),1+Math.floor(Math.random()*253)].join('.')};
+let ipStop=null,ipOk=false;
+function ipBtns(on){['#sBtn','#lt'].forEach(s=>{const b=$(s);b.textContent=on?'Arrêter la recherche':'Chercher l’IP du téléphone';b.className='btn '+(on?'r':'p')})}
+function ipRun(after){const l=lst().filter(isIp);if(!l.length){toast('Ajoute des IP dans ta liste');if(after)setSt('off');return}
+$('#lres').innerHTML='';ipBtns(true);let n=0;log('Recherche de l’IP du téléphone…');
+const h=setInterval(()=>{n++;const ip=phoneIp(l),m=l.some(e=>ip===e||(e.endsWith('.')&&ip.startsWith(e))),c=m?'ok':'bad',tx=m?'IP trouvé':'Pas dans la liste';
+$('#pip').hidden=false;$('#pip').innerHTML=`<span>${ip}<br><small>IP du téléphone</small></span><span class="chip ${c}">${tx}</span>`;
+$('#lres').insertAdjacentHTML('afterbegin',`<div class="item"><span>${ip}</span><span class="chip ${c}">${tx}</span></div>`);
+if(m||n>=20){log(m?'IP du téléphone '+ip+' trouvé dans la liste':'Échec : aucun IP correspondant après 20 essais',m?'ok':'bad');clearInterval(h);ipStop=null;ipBtns(false);ipOk=m;$('#sst').textContent=m?'IP trouvé : la recherche s’arrête. Connexion possible.':'Aucun IP correspondant après 20 essais';if(after){m?after():setSt('off')}}else $('#sst').textContent='Recherche de l’IP du téléphone · essai '+n},900);
+ipStop=()=>clearInterval(h)}
+function ipToggle(){if(ipStop){ipStop();ipStop=null;ipBtns(false);$('#sst').textContent='Recherche arrêtée';if(st==='mid')setSt('off');return}ipRun()}
+$('#sBtn').onclick=$('#lt').onclick=ipToggle;
+let hStop=null;
+const hosts=()=>[...new Set($('#hl').value.split('\n').map(s=>s.trim()).filter(Boolean))];
+function hEnd(){hStop=null;const b=$('#hBtn');b.textContent='Tester les hôtes';b.className='btn p'}
+$('#hBtn').onclick=()=>{const b=$('#hBtn');if(hStop){hStop();hEnd();$('#hprog').textContent='Test arrêté';return}
+const a=hosts();if(!a.length){toast('Ajoute des hôtes dans la liste');return}
+$('#found').innerHTML='';log('Test de '+a.length+' hôte'+(a.length>1?'s':'')+'…');b.textContent='Arrêter le test';b.className='btn r';$('#hprog').textContent='Test en cours · 0/'+a.length;
+hStop=run(a,(e,ok,ms)=>$('#found').insertAdjacentHTML('beforeend',`<div class="item"><span>${esc(e)}<br><small>${ok?ms+' ms':'Pas de réponse'}</small></span><span class="chip ${ok?'ok':'bad'}">${ok?'Fonctionne':'Ne fonctionne pas'}</span></div>`),(i,n)=>$('#hprog').textContent='Test en cours · '+i+'/'+n,f=>{hEnd();log('Test des hôtes terminé : '+f+' sur '+a.length+' fonctionnent',f?'ok':'bad');$('#hprog').textContent=f?f+(f>1?' hôtes fonctionnent':' hôte fonctionne')+' sur '+a.length:'Aucun hôte ne fonctionne ('+a.length+' testés)'})};
+const cnt=()=>$('#cnt').textContent=lst().filter(isIp).length+' IP dans la liste';cnt();$('#lst').oninput=cnt;
+$('#clr').onclick=()=>{$('#lst').value='';cnt()};
+$('#imp').onclick=()=>$('#fi').click();
+$('#fi').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{$('#lst').value=String(r.result);cnt();toast('Fichier importé')};r.readAsText(f)};
+$('#lsave').onclick=()=>toast(lst().filter(isIp).length+' IP enregistrés');
+
+/* ===== Options d’export ===== */
+const OPTS=[['lock','Verrouiller la configuration'],['hwid','Verrouiller à cet appareil (HWID)'],['wifi','Empêcher l’usage via WiFi'],['root','Empêcher sur appareil rooté'],['exp','Définir une expiration'],['life','Durée de vie du fichier (import impossible après)'],['lim','Limiter la consommation de données'],['creator','Indiquer le créateur']];
+const MSG=[['w','Message d’accueil (optionnel)'],['m','Message de connexion (optionnel)']];
+const T={exp:['Date d’expiration','dt'],life:['Import impossible après','dt'],lim:['Limite de données','lim'],creator:['Nom du créateur','text'],w:['Message d’accueil','area'],m:['Message de connexion','area']};
+let ex={lock:true};
+const nowL=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+const vs=k=>/^\d{4}-\d\d-\d\dT/.test(ex[k])?ex[k].replace('T',' à '):ex[k];
+function ed(t,h,ok,cancel){$('#et').textContent=t;$('#ef').innerHTML=h;$('#em').hidden=false;$('#eok').onclick=async()=>{if(await ok())$('#em').hidden=true};$('#eno').onclick=()=>{$('#em').hidden=true;cancel&&cancel()}}
+function openEd(k){const[t,ty]=T[k],v=ex[k]&&ex[k]!==true?ex[k]:'';
+const h=ty==='dt'?`<label for="ei" class="mut">Choisis la date et l’heure</label><input type="datetime-local" id="ei" value="${v}" min="${nowL()}" style="margin-top:6px">`:ty==='lim'?`<div class="row"><input type="number" id="ei" min="1" value="${parseFloat(v)||''}" placeholder="Quantité" aria-label="Quantité"><select id="eu" aria-label="Unité"><option>Mo</option><option ${/Go/.test(v)?'selected':''}>Go</option></select></div>`:ty==='area'?`<textarea id="ei" aria-label="${t}" style="height:100px">${esc(v)}</textarea>`:`<input type="text" id="ei" value="${esc(v)}" aria-label="${t}">`;
+ed(t,h,()=>{const i=$('#ei').value.trim();if(!i){toast('Remplis le champ');return false}
+if(ty==='dt'&&new Date(i)<Date.now()){toast('Choisis une date à venir');return false}
+if(ty==='lim'&&!(parseFloat(i)>0)){toast('Écris une quantité');return false}
+ex[k]=ty==='lim'?i+' '+$('#eu').value:i;renderOpts();return true},renderOpts)}
+const rows=l=>l.map(([k,t])=>`<div><label class="chk"><input type="checkbox" data-k="${k}" ${ex[k]?'checked':''}>${t}</label>${ex[k]&&ex[k]!==true?`<div class="mut" style="margin:-4px 0 8px 32px;font-size:13px">${esc(vs(k))} <button class="btn s" data-ed="${k}" style="height:32px;margin-left:6px">Modifier</button></div>`:''}</div>`).join('');
+function renderOpts(){$('#opts').innerHTML=rows(OPTS);$('#msgs').innerHTML=rows(MSG);
+$$('[data-k]').forEach(c=>c.onchange=()=>{const k=c.dataset.k;if(!c.checked){delete ex[k];renderOpts();return}if(T[k])openEd(k);else{ex[k]=true;renderOpts()}});
+$$('[data-ed]').forEach(b=>b.onclick=()=>openEd(b.dataset.ed))}
+
+/* ===== Chiffrement et format .fasodark ===== */
+/* Format : FD1.P.<base64 JSON> (non verrouillé) ou FD1.E.<base64 iv+AES-GCM> (verrouillé). */
+const KEYTXT='FasoDARK/v1/cle-demo',SALT='fasodark-sel';
+const enc=new TextEncoder(),dec=new TextDecoder();
+function b64(u){let s='';u.forEach(b=>s+=String.fromCharCode(b));return btoa(s)}
+function unb64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+async function aesKey(){const raw=await crypto.subtle.importKey('raw',enc.encode(KEYTXT),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:enc.encode(SALT),iterations:100000,hash:'SHA-256'},raw,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function seal(obj){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await aesKey(),enc.encode(JSON.stringify(obj))));const o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return b64(o)}
+async function unseal(s){const u=unb64(s);return JSON.parse(dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},await aesKey(),u.slice(12))))}
+
+/* ===== Import (lien ou fichier) ===== */
+async function importText(t){
+t=String(t).replace(/^﻿/,'').replace(/\s/g,'').replace(/^fasodark:\/\//i,'');
+let j;try{const p=t.split('.');if(p.length!==3||p[0]!=='FD1')throw 0;j=p[1]==='E'?await unseal(p[2]):JSON.parse(dec.decode(unb64(p[2])));if(!j||!j.n||!j.cfg)throw 0}catch(e){log('Échec : lien ou fichier non valide','bad');toast('Lien ou fichier non valide');return false}
+const x=j.x||{},now=Date.now();
+if(x.life&&new Date(x.life)<now){toast('Fichier expiré : import impossible');return false}
+if(x.exp&&new Date(x.exp)<now){toast('Profil expiré');return false}
+const f={n:String(j.n),locked:!!j.lock,cfg:{...DEF,...j.cfg},exp:x.exp,lim:x.lim,creator:x.creator,w:x.w,m:x.m};
+files.push(f);act=files.length-1;applyCfg(f);renderF();show('home');log('Configuration importée : '+f.n,'ok');toast('Configuration importée');return true}
+$('#impL').onclick=()=>ed('Importer un lien','<label for="ei" class="mut">Colle le lien fasodark://</label><textarea id="ei" style="height:100px;margin-top:6px"></textarea>',()=>importText($('#ei').value));
+$('#impF').onclick=()=>$('#ffi').click();
+$('#ffi').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;if(f.size>500000){toast('Fichier trop gros');return}const r=new FileReader();r.onload=()=>importText(r.result);r.readAsText(f)};
+
+/* ===== Export ===== */
+let expIdx=0,link='',tab='Fichier',fname='',payload='',lk=true;
+function openExport(i){const f=files[i];if(!f){toast('Ajoute d’abord une configuration');return}if(f.locked){toast('Configuration verrouillée : export impossible');return}expIdx=i;$('#epn').textContent=f.n;$('#nm').value=f.n;show('export')}
+$('#expGo').onclick=()=>openExport(act);
+function pbody(){$$('#tabs button').forEach(b=>b.classList.toggle('on',b.textContent===tab));$('#cp').textContent=tab==='Fichier'?'Télécharger':'Copier';
+const kb=(new Blob([payload]).size/1024).toFixed(1).replace('.',',');
+$('#pbody').innerHTML=tab==='QR'?'<div class="code">QR code<br><small>Bientôt disponible</small></div>':tab==='Lien'?`<div class="code">${esc(link.slice(0,150))}…</div><small style="display:block;margin-bottom:8px">Colle ce lien dans Profil, Importer un lien.</small>`:tab==='Fichier'?`<div class="code"><b>${esc(fname)}${DL?'.fasodark.txt':'.fasodark'}</b><br><small>${kb} Ko · ${lk?'chiffré : adresse, UUID, hôte et chemin cachés':'non chiffré : lisible par tous'}</small></div><small style="display:block;margin-bottom:8px">Envoie ce fichier. La personne le touche, choisit l’application et se connecte. Pour l’ouvrir dans l’application : Profil, Importer un fichier.</small>`:`<div class="code">Envoi vers le cloud<br><small>Bientôt disponible</small></div>`}
+$('#tabs').innerHTML=['Fichier','QR','Lien','Cloud'].map(t=>`<button>${t}</button>`).join('');
+$$('#tabs button').forEach(b=>b.onclick=()=>{tab=b.textContent;pbody()});
+$('#exp').onclick=async()=>{const f=files[expIdx];if(!f||f.locked){toast('Export impossible');return}
+fname=($('#nm').value.trim()||f.n).replace(/[\\\/:*?"<>|]/g,'_');
+const x={};['exp','life','lim','creator','w','m'].forEach(k=>{if(ex[k]&&ex[k]!==true)x[k]=ex[k]});
+const o=OPTS.filter(([k])=>ex[k]).map(a=>a[1]);
+const env={n:fname,lock:!!ex.lock,o,x,cfg:f.cfg};lk=!!ex.lock;
+try{payload=lk?'FD1.E.'+await seal(env):'FD1.P.'+b64(enc.encode(JSON.stringify(env)))}catch(e){toast('Chiffrement impossible ici');return}
+link='fasodark://'+payload;log('Export de « '+fname+' »'+(lk?' (verrouillé)':''),'ok');tab='Fichier';pbody();$('#pm').hidden=false};
+$('#px').onclick=()=>$('#pm').hidden=true;
+let DL=null;
+try{Promise.resolve(window.claude&&window.claude.use?window.claude.use('downloads'):null).then(d=>DL=d).catch(()=>{})}catch(e){}
+function saveLocal(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([payload],{type:'application/octet-stream'}));a.download=fname+'.fasodark';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('Fichier téléchargé')}
+async function dl(){if(!DL){saveLocal();return}
+try{await DL.save({filename:fname+'.fasodark.txt',data:payload});toast('Fichier enregistré')}catch(e){if(e&&e.code==='declined')return;toast('Enregistrement impossible ici : copie le lien')}}
+$('#cp').onclick=async()=>{if(tab==='Fichier'){dl();return}try{await navigator.clipboard.writeText(link);toast('Lien copié')}catch(e){toast('Copie impossible ici : sélectionne le lien')}};
+$('#sh').onclick=async()=>{try{if(tab==='Fichier'){const file=new File([payload],fname+'.fasodark',{type:'application/octet-stream'});if(navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({files:[file],title:fname});else toast('Partage non disponible ici : télécharge le fichier')}else if(navigator.share)await navigator.share({text:link});else toast('Partage non disponible ici')}catch(e){if(e&&e.name==='AbortError')return;toast('Partage impossible ici : télécharge le fichier ou copie le lien')}};
+/* ===== Apparence ===== */
+function setMode(m){document.documentElement.dataset.mode=m;$$('#modeSeg button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.m===m)));try{localStorage.setItem('fd-mode',m)}catch(e){}}
+$$('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+let mode0='dark';try{if(localStorage.getItem('fd-mode')==='light')mode0='light'}catch(e){}
+setMode(mode0);
+/* ===== Page de démarrage ===== */
+(function(){const s=$('#splash');let done=false;function end(){if(done)return;done=true;s.classList.add('out');setTimeout(()=>{s.hidden=true},500)}
+s.onclick=end;const short=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;setTimeout(end,short?600:1800)})();
+renderOpts();applyCfg(files[0]);renderF();
+</script>
+</body></html>
