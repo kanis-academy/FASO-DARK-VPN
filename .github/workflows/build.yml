@@ -12,9 +12,46 @@ jobs:
       - run: mkdir -p www && cp index.html www/index.html
       - run: npm install
       - run: npx cap add android
+      - name: Logo et ecran de demarrage
+        run: |
+          pip install pillow
+          python3 - <<'PY'
+          import re, base64, io, glob, os
+          from PIL import Image
+          html = open('index.html', encoding='utf8').read()
+          b64 = re.search(r'<img src="data:image/png;base64,([^"]+)"', html).group(1)
+          logo = Image.open(io.BytesIO(base64.b64decode(b64))).convert('RGBA')
+          bg = logo.getpixel((6, 48))[:3]
+          hexbg = '#%02X%02X%02X' % bg
+          res = 'android/app/src/main/res'
+          legacy = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
+          fore = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
+          for d in legacy:
+              p = f'{res}/mipmap-{d}'
+              os.makedirs(p, exist_ok=True)
+              ic = logo.resize((legacy[d], legacy[d]), Image.LANCZOS)
+              ic.save(f'{p}/ic_launcher.png')
+              ic.save(f'{p}/ic_launcher_round.png')
+              n = fore[d]
+              c = Image.new('RGBA', (n, n), bg + (255,))
+              s = int(n * 0.66)
+              c.paste(logo.resize((s, s), Image.LANCZOS), ((n - s) // 2, (n - s) // 2), logo.resize((s, s), Image.LANCZOS))
+              c.save(f'{p}/ic_launcher_foreground.png')
+          open(f'{res}/values/ic_launcher_background.xml', 'w').write(
+              f'<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">{hexbg}</color>\n</resources>\n')
+          for f in glob.glob(f'{res}/drawable*/splash.png'):
+              w, h = Image.open(f).size
+              c = Image.new('RGBA', (w, h), bg + (255,))
+              s = int(min(w, h) * 0.30)
+              L = logo.resize((s, s), Image.LANCZOS)
+              c.paste(L, ((w - s) // 2, (h - s) // 2), L)
+              c.save(f)
+          print('Logo OK', hexbg)
+          PY
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: faso-dark-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          
